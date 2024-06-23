@@ -1167,3 +1167,291 @@ Visibilidade de métodos
 Validando negociações em dias úteis
 Vantagens do uso de enums
 Cuidados com enums
+
+#### 23/06/2024
+
+@04-Visibilidade de métodos e Enumeration
+
+@@01
+Projeto da aula anterior
+
+Você pode ir acompanhando o passo a passo do desenvolvimento do nosso projeto e, caso deseje, você pode baixar o projeto do curso.
+Bons estudos!
+
+https://github.com/alura-cursos/typescript-curso-2/archive/0ca238809f1b51272e148991530dd7a232290b98.zip
+
+@@02
+Isolando a lógica de conversão de entrada
+
+[00:00] Vamos aprender outra coisa para a nossa aplicação. É um problema real, vamos motivar algo no TypeScript e olhar esse método private() de negociação.
+[00:15] Esse item está criando uma negociação a partir do input do usuário, onde sabemos que os valores que são lidos vêm em formato string. Mas vamos supor que eu esteja criando negociações a partir de um arquivo txt que eu estou importando, um arquivo que alguém exportou.
+
+[00:33] Provavelmente, quando eu for ler esse item, ele vai ler esses dados no formato string e eu vou ter de converter para a data, quantidade de valor e realizar toda essa conversão aqui. Então, que tal, no lugar do controller, a negociação-controller ser o responsável em criar uma negociação baseado nos valores de entrada, valores string, eu colocar essa lógica na própria instância de negociação?
+
+[01:00] O que vocês acham? Vamos tentar fazer isso aqui comigo? Vamos ver se vai dar certo? Eu vou criar em negociação. Mesmo se você achar estranho, vem comigo. Eu vou criar em método, public criaDe(data: string, quantidade: string, valor: string.
+
+[01:38] O que esse método vai fazer? Eu vou em negociação-controller, vou pegar esse item que está aqui, esse bloco de código, vou jogar para cá. Em vez de eu pegar do input value, eu vou pegar esse item de date. Só que não pode ser.
+
+[02:02] Eu vou colocar datestring: string, quantidadestring: string, valorstring: string. Só para ficar mais clara essa separação. Então aqui, olha, data*string*. O que eu vou fazer? Daqui eu pego a datastring; e esse item aqui, eu pego quantidadestring. Desse item, eu pego valorstring.
+
+[02:29] Então, esse criaDe é um método da minha negociação, instância de negociação, e se eu passar uma data de string, uma quantidade de string e um valor de string, ele vai realizar a conversão para mim, e, no final, vai me retornar uma negociação com esses valores convertidos. A classe vai se tornar uma instância dela mesma.
+
+[02:53] Então, também é uma prática eu não deixar que insira um tipo de retorno. Eu vou dizer que o tipo é negociação. Ficou claro? Eu vou salvar. Deixar eu voltar no meu código. Nenhum erro de compilação. Vou em negociação-controller, vou remover o “cria” de negociação.
+
+[03:25] Vai dar erro de compilação, porque o TypeScript vai detectar que eu estou chamando um método, e esse item não cria. Então, o que eu preciso fazer? Eu preciso criar uma negociação chamando aquele método criaDe.
+
+[03:42] Olha só. Eu tenho, para fazer isso, eu vou ter que fazer isso aqui: const negociaçãoTemp = new Negociação(null, 0, 0). E olha o que eu vou fazer? criaDe. O que esse item vai fazer para mim? Eu vou passar para ele o this.insputData.value, this.inputData.quantidade.value, this.inputValor.value.
+
+[04:50] Fiz isso. Será que vai funcionar? Vamos testar. Vou salvar. Nenhum erro de compilação. Volto para o meu código. Coloco aqui o 17. Vou colocar o valor. Incluir. Incluiu, fez a conversão, tudo certo. [05:11] Mas olha que bizarro. Para eu criar uma conversão, eu quis colocar a lógica de conversão na classe de negociação porque eu acho que essa lógica deveria ficar lá, perto do view de negociação. Isso é questionável; pode ser que alguma pessoa pense que isso não deva ficar lá, mas eu quis colocar.
+
+[05:29] O que acontece? Para eu converter uma negociação, eu preciso criar uma negociação com um valor tabajara, null, 0, 0, para poder chamar o método de instância para converter e criar a negociação. Olha, está bem nisso aí, não está legal, mas eu ainda quero que essa lógica, esse método criaDe faça parte da classe negociação.
+
+[05:55] E como resolvemos isso? Aprenderemos no próximo vídeo.
+
+@@03
+Métodos estáticos
+
+[00:00] Vamos olhar esse Frankenstein que eu criei. Qual era o meu objetivo? Eu queria criar essa lógica, quero mover essa lógica de criação de uma negociação a partir de valores na string na própria classe negociação. Porque se eu precisar saber. “Onde é que está a lógica que realiza essa convenção?”, eu vou à classe negociação e descubro que ela está lá.
+[00:22] De novo. Pode ser que outros desenvolvedores achem melhor colocar o arquivo em separado, mas eu quis colocar lá, porque, para mim, nesse projeto, faz sentido.
+
+[00:32] Mas o problema é que se eu coloco esse método criaDe na classe negociação, eu preciso ter uma instância da classe negociação para poder criar uma negociação. Então, esse é um método de instância; ele só pode ser chamado depois que eu instancio uma negociação.
+
+[00:58] Ainda posso tentar isso aqui. Fazer aqui, evitar criar essa variável temp, eu posso fazer isso aqui, só para poder chamar o método que queria uma negociação.
+
+[01:11] Isso não está legal. Qual é a ideia? A ideia é a seguinte: esse método criaDe não deve ser um método de uma instância. Ele tem que ser um método que é padrão, ele pode ser acessado independente se eu tenho uma instância, mas, ainda assim, eu quero que seja na classe negociação.
+
+[01:30] Presta atenção, vem comigo. Eu quero esse método acessível não através de uma instância, mas esse método faz sentido estar na classe negociação. E se eu conseguir fazer esse método ser um método da classe? Um método que é independente da instância, mas um método que eu posso chamar na própria classe. Vamos ver?
+
+[01:53] Olha o que eu quero fazer. Eu quero poder fazer isso aqui. Negociação.criaDe. Pegaram a ideia? Esse método, se ele for um método em que eu acesso diretamente na classe, sem precisar passar por uma instância, eu resolvo esse problema, porque não preciso de uma instância de negociação, e esse método continua lá na classe negociação.
+
+[02:16] Como eu faço isso? Para fazer isso, é só voltar lá na nossa negociação, chamar esse método de public static criaDe. Todo método estático é um método que eu posso chamar da classe, diretamente na classe. Olha que bacana. O meu código, eu ainda não salvei. Se eu venho em negociação-controller, esse item está aqui.
+
+[02:43] Deixa eu salvar. Salvei. Vou salvar aqui o criaDe. Passou. Vou tirar o static. Vou salvar. Volto no meu controller. Não posso chamar. Mas, de novo, se eu torno esse método estático, public static. Salvo.
+
+[03:04] Agora, eu posso chamar esse método, e quando eu clico aqui, ele só me mostra esse método da classe, porque é um método estático. Será que funciona? Deixa eu salvar. Salvei. Vou voltar lá no navegador. Deixa eu ver se deu erro de compilação. Zero.
+
+[03:24] Vou voltar no navegador. Vou ditar isso aqui, ele não vai conseguir. Gravou. Converteu minha negociação. Está tudo certo. Ela está lá. Então, a sacada é a seguinte: às vezes você pode querer ter um método, que ela faz sentido, pertencer a um domínio de negociação, mas não em uma instância específica.
+
+[03:49] Mas você quer que fique disponível em qualquer lugar da sua aplicação onde você tem acesso à classe negociação. Para conseguir isso, você transforma esse método não no método de distância, mas no método da própria classe. Ficou claro? Então, funcionou. Eu consegui isolar esse código lá.
+
+[04:10] Outra coisa importante é: se eu escrevo negociação, e dou dot, você não vai ver o método criaDe, porque é um método estático. Para eu ter acesso a esse método, eu tenho de ir à classe negociação. Olha lá, criaDe.
+
+[04:39] Então, é mais um recurso da linguagem TypeScript que vem por padrão para utilizarmos, que resolve esse problema que eu apresentei para vocês. Então, vamos lá, vamos continuar.
+
+[04:52] Antes de continuar, uma pergunta: faz sentido esse método ser private? Vou colocar private, venho aqui. Não faz. Porque se eu quero chamar esse método diretamente da minha classe negociação, ele tem que ser public.
+
+[05:10] Então, métodos estáticos, sempre public, para utilizarmos. Ficou claro? Então, agora, vamos continuar. Vamos lá. Vou salvar. Vamos continuar.
+
+@@04
+Tornando um método estático
+
+Emma decidiu criar uma classe responsável por conter todas as operações auxiliares que operam sobre data:
+class DateUtils {
+
+    public ehDiaUtil(data: Date) {
+        return data.getDay() > DiasDaSemana.DOMINGO
+            && data.getDay() < DiasDaSemana.SABADO;
+    }
+}
+COPIAR CÓDIGO
+Vejamos a seu código em ação:
+
+const dateUtils = new DateUtils();
+const ehDiaUtil = dateUtils.ehDiaUtil(new Date());
+COPIAR CÓDIGO
+Marque a opção que transforma corretamente o método ehDiaUtil em um método estático.
+
+class DateUtils {
+
+    public static ehDiaUtil(data: Date) {
+        return data.getDay() > DiasDaSemana.DOMINGO
+            && data.getDay() < DiasDaSemana.SABADO;
+    }
+}
+ 
+Alternativa correta! Métodos estáticos podem ser acessados diretamente pela classe sem precisarmos de uma instância desta mesma classe.
+Alternativa correta
+class DateUtils {
+
+    static public ehDiaUtil(data: Date) {
+        return data.getDay() > DiasDaSemana.DOMINGO
+            && data.getDay() < DiasDaSemana.SABADO;
+    }
+}
+ 
+Alternativa correta
+class DateUtils {
+
+    public abstract ehDiaUtil(data: Date) {
+        return data.getDay() > DiasDaSemana.DOMINGO
+            && data.getDay() < DiasDaSemana.SABADO;
+    }
+}
+
+@@05
+Protegendo nosso template
+
+[00:00] Vamos estudar outra coisa na nossa aplicação. É o seguinte. Eu optei, e vocês estão seguindo aqui no curso, aquela solução de template, não é isso? Eu tenho lá dentro de views, eu tenho a mensagem-view, tenho negociacoes-view, onde eu defino esse template, onde eu faço tudo acontecer.
+[00:24] Mas toda vez que você trabalhar com o innerHTML, com esse recurso, vamos lá em view, esse HTML, o ideal é fazer um scape nesse template, dessa string que vamos jogar no HTML.
+
+[00:39] Por questões de segurança, por exemplo, alguns navegadores já protegem por padrão; outros, não protegem, é colocar, por exemplo, uma tag script aqui dentro, e vou colocar no meu template uma tag script, onde eu posso ter algum código malicioso, ou nesse sentido.
+
+[00:58] O Chrome é esperto, ele não vai exibir esse item aqui, não. Salvei. Vou lá para o navegador. Quando eu olho lá, se eu olho em index HTML, nos elementos do DOM, você nem vê a tag script aqui dentro, já é removida.
+
+[01:25] Então, nós não vamos pegar carona na proteção padrão do navegador; vamos tentar fazer esse script, criar um artifício que permita o seguinte: se alguém passar um script no nosso template, nós vamos remover.
+
+[01:46] Como eu vou fazer isso? Eu vou chegar lá no meu código, vou lá em view. Pode ser que eu queira fazer isso, pode ser que eu não queira. Então eu vou tornar opcional. Eu vou chegar no construtor, seletor, vou colocar no parâmetro, que eu vou chamar de escapar. Um segundo parâmetro, escapar.
+
+[02:09] Ele vai ser boolean. Esse valor que eu peguei, eu vou guardar em uma variável private, que vai ser do tipo boolean e que vai começar de falso. Eu não preciso colocar o tipo boolean aqui porque o TypeScript já infere, como eu estou atribuindo valor, que esse item vai ser boolean.
+
+[02:32] Qual é a ideia agora? Estou com o meu template aqui. Vou colocar esse item como let. E eu reatribuo a variável. if (this.escapar), se ele é true, o que eu vou fazer? Eu vou fazer um escape. Vou dizer que template = template.replace ().
+
+[03:03] Qual é a expressão regular? Vai ser /<script>[\s\S]*?<script>/.
+
+[03:46] Expressão regular é uma ciência. Vamos focar aqui no código, expressão regular. Vou substituir esse item por em branco. Deixa eu verificar se não cometi nenhuma gafe. Tenho uma expressão regular que começa aqui e termina aqui.
+
+[04:04] O que eu falo? Remove todo mundo, a tag script. Pega isso aqui, eu fiz um grupo com /S*?. Você olha lá no capítulo e vê se eu já não coloquei essa expressão regular lá para você não correr o risco de digitar errado.
+
+[04:24] Fiz o scape, está aqui. Deixa eu testar para ver como ela vai funcionar fora do meu código. Salvei. Vou lá no meu navegador. Abro o console.log e digo que exp = /<script>[\s\S]*?<script>/.
+
+[04:43] Vou criar uma string que vai ser <script>alert(‘oi’)<\script>. Isso aqui é uma string. Eu vou dizer que essa string replace(exp), uma expressão regular. Vamos ver. Isso aqui ficou em branco. Olha lá, removeu. Se tivesse alguma outra coisa aqui, um parágrafo antes. <p>xxxx</p>. Só ficou o P. Removeu a tag script do início até o fim.
+
+[05:50] Então, essa é uma expressão regular que faz isso. Deixa eu voltar para o nosso código. Fiz isso. Ou seja, na hora em que eu estiver fazendo o meu template, meu replace, eu compilo o meu template de alguma variável template. Aí eu testo.
+
+[06:06] "É para escapar?". É. Eu faço esse replace no meu template e atribuo na própria variável, e daí eu jogo para cá. Faz sentido? Faz. Eu quero poder ligar e desligar isso a qualquer momento? Quero. Vou salvar.
+
+[06:21] Confira o console aqui comigo. Está salvo. Quando eu olho no console, eu começo a ter um monte de erro no meu código. Se olharmos esse erro de TypeScript, quando eu volto para lá, aqui, ele está dizendo o seguinte.
+
+[06:36] Olha só. negociacoes-view, ele está esperando dois parâmetros. O id e se é para escapar ou não. Esse aqui eu quero true; esse aqui eu quero false. Será que vai passar? Passou. Beleza. Problema resolvido.
+
+[06:57] Porém, o que eu quero fazer é o seguinte: o meu padrão é que se o meu código já estivesse escrito, já escrevi esse código, eu tenho mais de 100 views no meu sistema. Como eu acabei adicionando um parâmetro para a minha view, eu vou quebrar o meu código em todos os lugares, porque o TypeScript entende que você tem de passar um dos parâmetros.
+
+[07:22] Mas eu quero que esse escapar seja opcional. Por padrão, eu não quero que ele faça nada. Mas se você quiser fazer o escape, você passa true.
+
+[07:32] Pegaram a ideia? Então, como eu consigo fazer isso? Será que o TypeScript me ajuda? Porque eu vou quebrar o sistema inteiro. Eu poderia ir lá em todos e alterar? Poderia. Mas dependendo do escopo do teu sistema, você não quer fazer isso, você quer tornar opcional, e não quer ter erro de compilação nenhum.
+
+[07:47] É isso o que vamos ver no próximo vídeo.
+
+@@06
+Utilizando parâmetros opcionais
+
+[00:00] Então, o TypeScript tem um recurso na linguagem que ele permite fazer isso daqui. Está vendo aqui a minha variável, do meu parâmetro construtor? Primeiro, antes de mostrar, eu vou remover isso daqui. Removi. Eu tenho um erro de compilação. Faz todo o sentido.
+[00:18] Mas eu quero tornar esse parâmetro opcional. O que eu faço aqui? Vou colocar uma interrogação aqui. Olha, nenhum erro de compilação. Olha. Meu código está o quê? Compilando. Quando eu fiz isso, eu estou dizendo para o TypeScript que esse parâmetro é opcional. O usuário pode ou não passar.
+
+[00:41] Se ele não passou, qual vai ser o valor que vai ser adotado? False, que é o escapar = false, não vai fazer nada. Mas se eu passar true, o que eu tenho de fazer? Atribuir e mudar esse valor aqui.
+
+[00:55] Então, o que eu faço? Eu testo. Você precisa fazer essa lógica dentro do seu código if (escapar). Se ele é verdadeiro, this.escapar = escapar, e ele vai pegar o valor que você passou.
+
+[01:14] Não pense que é só você colocar opcional e estará tudo resolvido; você vai ter que mexer, vai ter que alterar o seu código para que esteja preparado para quando esse parâmetro opcional não for passado, o que você tem que adotar. Então, se eu não passo nada, esse item vai undefined.
+
+[01:29] Eu vou testar. undefined é falso? É. Então não vai entrar aqui dentro desse valor. Ele vai continuar falso. Se eu passar true, esse item vai chegar aqui e vai ser true; se for true, eu vou e mudo o valor da variável escapar, interno, propriedade da classe, para true.
+
+[01:48] E se eu passar false, também. Não vai entrar, mas se o private = escapar vai continuar sendo falso. Mas você tem que tomar cuidado quando você usa esse artifício, porque às vezes vale a pena você alterar a sua API em todos os lugares, mas às vezes isso pode ser custoso, por isso você usa opcional, e o opcional não funciona com primeiros parâmetros.
+
+[02:13] Se eu tentar utilizar o opcional, os últimos parâmetros do seu método, do seu construtor, são eles que têm de ser opcionais. Eu não posso ter uma lacuna. Eu posso ter dois valores obrigatórios e quatro opcionais no final. Agora, se eu tiver dois obrigatórios, um opcional e mais obrigatório, não vai rolar.
+
+[02:32] E o TypeScript está dizendo que não pode ser opcional. A required parameter cannot follow an optional parameter. Ou seja, o parâmetro que eu tenho que passar não pode seguir um parâmetro opcional. Ele tem que ser o último. É uma peculiaridade da linguagem JavaScript.
+
+[02:54] Então, se eu chego agora em negociaçõesView, no meu controller, eu estou passando em negociaçõesView, eu quero fazer para fazer o escape. Não quero fazer para mensagem, mas para o meu negociaçõesView, eu quero.
+
+[03:08] Então eu vou salvar. Salvei. Meu código continuar rodando. Volto para o navegador. Clico aqui. Tudo funcionando. Nenhum erro. Meu código está sendo executado.
+
+[03:31] Ficou claro essa ideia do parâmetro opcional? Se eu chegar, agora, no meu código, na minha view, e passar o parâmetro calopsita: boolean, se eu faço isso e salvo, meu Controller não vai passar.
+
+[03:51] Mas como ele é um dos últimos, ele pode ser opcional, e o meu código vai passar. Não pode ter nenhum required antes dele. Eu poderia até assim, olha, mas aí não vai compilar o código. Então, só para mostrar isso aí, mais um recurso da linguagem TypeScript que podemos utilizar dentro do nosso projeto.
+
+@@07
+Sobre parâmetros opcionais
+
+Sobre parâmetros opcionais, marque as opções que contêm códigos que compilam corretamente:
+Selecione 2 alternativas
+
+function(a: number, b?:number, c:number): void { }
+ 
+Alternativa correta
+function(a?: number, b?:number, c:number): void { }
+ 
+Alternativa correta
+function(a: number, b:number, c?:number): void { }
+ 
+Alternativa correta! O código compila, pois o parâmetro opcional é o último parâmetro.
+Alternativa correta
+function(a: number, b?:number, c?:number): void { }
+ 
+Alternativa correta! O código compila, pois os parâmetros opcionais são os últimos parâmetros.
+
+[00:00] Vamos para uma revisão. Rapidinho. O que vimos nesse capítulo? Vimos que a criação, a transformação do input do usuário, dos dados da UI em uma negociação, a lógica de conversão estava dentro do meu controller.
+[00:17] Mas aprendemos que poderia ser interessante mover essa lógica que recebe uma data em string, uma quantidade em string e um valor em string para a própria classe negociação.
+
+[00:27] Mas a nossa primeira tentativa não deu certo, porque, ao adicionar no nosso modelo de negociação, o método criaDe, cria de string, string e string, eu precisava criar uma instância de negociação para poder utilizar esse método.
+
+[00:43] Se eu quero criar uma negociação, como eu vou primeiro criar uma negociação para depois chamar o método para criar uma negociação? Então foi uma forçação de barra, e de vez em quando isso acontece. Não é raro acontecer.
+
+[00:56] Mas vimos que o que seria interessante é que esse método, em vez de ser um método de instância, o que significa? Em vez de ser um método que eu chamo a partir de um objeto criado através de uma classe, esse item pode ser um método de classe.
+
+[01:10] Então foi por isso que, voltando em negociação, nós criamos o método criaDe como public static criaDe. Esse método, quando é estático, esse modificador static, me permite chamar diretamente, na classe, o método. Isso é muito importante.
+
+[01:28] Uma coisa que isolamos dentro deste método foi a criação dos dados da negociação diretamente para uma negociação, e nós fizemos isso, um método estático, retornando uma negociação passando os valores convertidos.
+
+[01:46] Então, o método estático, dependendo do seu cenário, pode ser vantajoso ou não. Outra coisa que vimos foi a questão dos parâmetros operacionais. Uma coisa que acontece é o seguinte. Fomos na nossa view.
+
+[02:04] É interessante que na nossa view, nós temos a opção de fazer o escalpe, escapar determinadas strings do template para que possa garantir a segurança da nossa aplicação. Tudo bem que aqui é uma aplicação reduzida e você nem vai usar isso em produção. Você vai usar um framework como angular, React, e por aí vai, mas não vamos deixar de implementar isso.
+
+[02:25] Então, o que fizemos? Adicionamos um parâmetro especial no construtor de view para dizer se eu quero fazer o escape ou não. O problema é que, ao adicionar esse segundo parâmetro no construtor de view, todo o meu outro código que chamava o construtor de view, que herdava de view e passava os parâmetros, quebrou. Porque agora eu sou obrigado a passar esse segundo parâmetro.
+
+[02:49] Como é uma aplicação pequena, não tem problema nenhum alteramos em todos os lugares e passar o valor desejado. Vai ser uma aplicação onde você tem mais de 100, 200 classes, pode ser que essa alteração da API da sua classe, do construtor da sua classe, quebre a sua aplicação e seja muito custoso você resolver isso, e você nem tem tempo para resolver.
+
+[03:10] Então, uma opção é tornar o parâmetro opcional, utilizando o recurso do TypeScript. Que recurso é esse? Eu pego o parâmetro, passo a interrogação, e isso indica para o compilador que esse parâmetro é opcional.
+
+[03:24] Se você não passar, eu vou passar só um parâmetro para o construtor. Estávamos esperando que o construtor fosse reclamar porque eu só passei um, mas nada vai acontecer porque o segundo parâmetro é opcional.
+
+[03:34] Então, o TypeScript entende que você quer “fazer vista grossa” para esse parâmetro. Mas nem por isso você precisa tratar essa situação, porque se ele é opcional, o que acontece no seu código? Então você precisa, de alguma maneira, sempre que você trabalha com parâmetros opcionais, é ter algum código, alguma lógica no construtor da sua classe para lidar com esse parâmetro.
+
+[03:54] É isso. Fizemos isso, e vamos para o próximo capítulo. Porque no próximo capítulo, nós vamos ativar alguns recursos do compilador TypeScript que vai deixar a nossa vida um pouquinho mais complicada, porém vai garantir uma maior saúde, uma maior qualidade do nosso código. Então vamos para o próximo capítulo.
+
+@@08
+Revisão
+
+[00:00] Vamos para uma revisão. Rapidinho. O que vimos nesse capítulo? Vimos que a criação, a transformação do input do usuário, dos dados da UI em uma negociação, a lógica de conversão estava dentro do meu controller.
+[00:17] Mas aprendemos que poderia ser interessante mover essa lógica que recebe uma data em string, uma quantidade em string e um valor em string para a própria classe negociação.
+
+[00:27] Mas a nossa primeira tentativa não deu certo, porque, ao adicionar no nosso modelo de negociação, o método criaDe, cria de string, string e string, eu precisava criar uma instância de negociação para poder utilizar esse método.
+
+[00:43] Se eu quero criar uma negociação, como eu vou primeiro criar uma negociação para depois chamar o método para criar uma negociação? Então foi uma forçação de barra, e de vez em quando isso acontece. Não é raro acontecer.
+
+[00:56] Mas vimos que o que seria interessante é que esse método, em vez de ser um método de instância, o que significa? Em vez de ser um método que eu chamo a partir de um objeto criado através de uma classe, esse item pode ser um método de classe.
+
+[01:10] Então foi por isso que, voltando em negociação, nós criamos o método criaDe como public static criaDe. Esse método, quando é estático, esse modificador static, me permite chamar diretamente, na classe, o método. Isso é muito importante.
+
+[01:28] Uma coisa que isolamos dentro deste método foi a criação dos dados da negociação diretamente para uma negociação, e nós fizemos isso, um método estático, retornando uma negociação passando os valores convertidos.
+
+[01:46] Então, o método estático, dependendo do seu cenário, pode ser vantajoso ou não. Outra coisa que vimos foi a questão dos parâmetros operacionais. Uma coisa que acontece é o seguinte. Fomos na nossa view.
+
+[02:04] É interessante que na nossa view, nós temos a opção de fazer o escalpe, escapar determinadas strings do template para que possa garantir a segurança da nossa aplicação. Tudo bem que aqui é uma aplicação reduzida e você nem vai usar isso em produção. Você vai usar um framework como angular, React, e por aí vai, mas não vamos deixar de implementar isso.
+
+[02:25] Então, o que fizemos? Adicionamos um parâmetro especial no construtor de view para dizer se eu quero fazer o escape ou não. O problema é que, ao adicionar esse segundo parâmetro no construtor de view, todo o meu outro código que chamava o construtor de view, que herdava de view e passava os parâmetros, quebrou. Porque agora eu sou obrigado a passar esse segundo parâmetro.
+
+[02:49] Como é uma aplicação pequena, não tem problema nenhum alteramos em todos os lugares e passar o valor desejado. Vai ser uma aplicação onde você tem mais de 100, 200 classes, pode ser que essa alteração da API da sua classe, do construtor da sua classe, quebre a sua aplicação e seja muito custoso você resolver isso, e você nem tem tempo para resolver.
+
+[03:10] Então, uma opção é tornar o parâmetro opcional, utilizando o recurso do TypeScript. Que recurso é esse? Eu pego o parâmetro, passo a interrogação, e isso indica para o compilador que esse parâmetro é opcional.
+
+[03:24] Se você não passar, eu vou passar só um parâmetro para o construtor. Estávamos esperando que o construtor fosse reclamar porque eu só passei um, mas nada vai acontecer porque o segundo parâmetro é opcional.
+
+[03:34] Então, o TypeScript entende que você quer “fazer vista grossa” para esse parâmetro. Mas nem por isso você precisa tratar essa situação, porque se ele é opcional, o que acontece no seu código? Então você precisa, de alguma maneira, sempre que você trabalha com parâmetros opcionais, é ter algum código, alguma lógica no construtor da sua classe para lidar com esse parâmetro.
+
+[03:54] É isso. Fizemos isso, e vamos para o próximo capítulo. Porque no próximo capítulo, nós vamos ativar alguns recursos do compilador TypeScript que vai deixar a nossa vida um pouquinho mais complicada, porém vai garantir uma maior saúde, uma maior qualidade do nosso código. Então vamos para o próximo capítulo.
+
+@@09
+Faça como eu fiz
+
+Chegou a hora de você seguir todos os passos realizados por mim durante esta aula. Caso já tenha feito, excelente. Se ainda não, é importante que você execute o que foi visto nos vídeos para poder continuar com a próxima aula.
+
+Continue com os seus estudos, e se houver dúvidas, não hesite em recorrer ao nosso fórum!
+
+@@10
+O que aprendemos?
+
+Nesta aula, aprendemos:
+Revisão da lógica de conversão negociações
+Método estáticos
+Parâmetros opcionais
