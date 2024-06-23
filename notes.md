@@ -869,3 +869,301 @@ Herança com TypeScript
 Classes com tipo genérico
 Classes abstratas
 O modificador protected
+
+#### 23/06/2024
+
+@03-Lapidando nosso código
+
+@@01
+Projeto da aula anterior
+
+Você pode ir acompanhando o passo a passo do desenvolvimento do nosso projeto e, caso deseje, você pode baixar o projeto do curso.
+Bons estudos!
+
+https://github.com/alura-cursos/typescript-curso-2/archive/67b1b1ee4847476c1be8c82880e206eb0f62a2f9.zip
+
+@@02
+Visibilidade do método template
+
+[00:00] Vamos começar a lapidar um pouco o nosso projeto antes que possamos evoluir. Uma coisa que eu quero chamar a atenção para vocês é o seguinte: quem utiliza o mensagemView ou o negociaçõesView, qual é o único método que essa pessoa está utilizando instâncias dessas classes precisa chamar? update.
+[00:27] É o update. Ninguém de fora. Chegando em negociação-controller, se eu olhar aqui, eu estou chamando de negociaçõesView.update, mensagemView.*update*. Todo mundo está chamando update, mas ninguém está chamando o template.
+
+[00:41] Porém, o estagiário que entrou na sua empresa, ele vai dar um dot e vai ver o update e o template. Esse template não faz sentido nenhum chamarmos esse método, porque esse método é chamado internamente pelo update. Então ele deveria estar escondido.
+
+[01:05] O que o desenvolvedor poderia só enxergar é o update, porque não faz sentido expor o método template para ele. Então, como fazemos isso? A primeira coisa que passa na nossa cabeça é colocar esse item como private abstract template.
+
+[01:23] Porque se ele é private, ninguém vai ter acesso. Mas o problema de colocar o private, que o próprio TypeScript está reclamando, é que não faz sentido usar para um método abstrato, esse método ser private. Porque se ele for private, o que está acontecendo aqui é que nem a filha vai poder ter acesso. Então, private não pode.
+
+[01:45] O padrão de métodos, se eu não falei isso com vocês, e eu falo agora, todo método por padrão, quando você não coloca o tipo, ele é public. Então, eu não precisei colocar, porque o TypeScript adota como padrão, se você não coloca modificador, bota como public.
+
+[02:03] E aqui, colocar como public, é redundante. Então, o que eu faço? Eu vou dizer que ele é protected. Quando eu coloco protected, eu estou dizendo o seguinte, que só eu, pai, e minhas filhas podem ter acesso a esse método.
+
+[02:28] Vou em negociaçõesView, que herdou. Agora, eu vou em negociação-controller, venho na linha debaixo, this.mensagemView, e o template ainda está aparecendo lá. Por quê? Porque na classe filha, quando herdamos e sobrescrevemos o template, ampliamos essa visibilidade.
+
+[03:01] Estamos colocando ela como public. Então esse é o X da questão. O nosso pai está protected, mas a filha está mudando para public. Então, se eu quiser evitar isso, eu chego e coloco protected. Vou em negociações.View e coloco protected. Salvo. Vou no meu controller.
+
+[03:40] E agora eu faço this.mensagemView., e só vejo o método update. Agora vem uma pergunta: se eu chegar lá na minha classe e colocar private, eu vou ter um erro de compilação, porque eu não posso botar esse item como private. Entendeu? Eu não tenho como ser algo privado dele. É incompatível sobrescrevê-lo.
+
+[04:06] Agora, um elemento que é protected, eu posso tornar public aqui; ou um que é protected, eu posso continuar a ser protected colocando protected. Então, essa alteração que fizemos, é para não deixar que o desenvolvedor veja outro método, além do método update quando trabalhar com nossas views.
+
+[04:28] Então vamos lapidando esse daqui. Vamos para o próximo.
+
+@@03
+Métodos privados
+
+[00:00] Vamos para negociaçõesView. Lá dentro, nós temos esse template que interpola a template string, o arrayde lista; onde fizemos o map() e convertemos cada negociação em uma string. Cada string dessa é interpolada com os valores do modelo.
+[00:32] E no final, eu pego essa lista, que agora não é mais de negociações onde não tem mais uma negociação, cada item não é mais uma negociação, mas sim uma string, eu vou concatenando tudo e cuspo aqui, jogo no tbody.
+
+[00:47] Eu quero fazer o seguinte. Esse código é muito grande. Que tal se colocarmos ele no método para deixar isso aqui mais legível? Então, olha o que eu vou fazer? Eu tenho um método template, e aqui eu vou criar um método public formatar(data: date).
+
+[01:23] O que esse item vai fazer? Eu vou copiar essa instrução que eu tenho aqui. Copiei para cá, em uma única linha, e esse item aqui, vou passar a data. O que eu estou fazendo? Vou retornar, return, esse item. O TypeScript vai inferir que esse item é uma string, mas vimos que uma boa prática define qual é o tipo do retorno.
+
+[01:56] E agora, aqui dentro, em vez de eu colocar isso tudo aqui, eu posso fazer this.formatar(negociação.data). Na verdade, eu vou chamar de conversor de data. Vai ser formatar mesmo. Eu não vou ficar brigando com nome aqui, mas eu podia pegar um nome melhor, e estou com falta de criatividade agora.
+
+[02:25] Então, eu chamei esse método. Será que vai continuar funcionando? Eu deixei o meu template mais enxuto, sem aquela verbosidade. Salvei. Vou lá no navegador. Vou adicionar aqui. Ou seja, tudo continua funcionando.
+
+[02:47] Mas, de novo. No design do seu modelo, você tem que tomar cuidado com o que você vai expor para o mundo externo. Porque se eu chego em negociaçõesView, e faço this.negociaçõesView.formatar, o formatar não estar aqui, indisponível.
+
+[03:14] O desenvolvedor não tem que saber que está rolando uma formatação por debaixo dos panos, só tem que chamar o update. E levantar a mão para o céu, porque é só isso que ele tem que fazer.
+
+[03:22] Então, não é uma coisa que passa pela nossa cabeça. Eu posso chegar aqui, nesse negociação, e colocar ele private, posso colocar ele privado. O método privado só pode ser acessado pela própria classe, nem pelas filhas podem.
+
+[03:40] Então, fiz isso, vou salvar. Salvei. Vou lá no navegador, continua, vejo se está tudo funcionando. Adicionei. Continua funcionando. Se eu volto lá no meu controller, e tento this.negociaçõesView, eu só vou ver o método update.
+
+[04:02] Então, a ideia é. Isso aqui vale também se você está trabalhando com React, está trabalhando com outros frameworks, simulation aplication, a ideia é a seguinte.
+
+[04:16] Olha uma coisa legal. No Visual Studio Code, se você marca um elemento, dá dois cliques com o botão direito, find all implementations. Ele lista para vocês todas as classes que implementam essa classe, que estendem essa classe.
+
+[04:34] Então, o que eu quero dizer se eu voltar lá em negociações e colocar esse item privado, o meu código fica mais organizado. E isso aqui não é exposto para quem está de fora. Então há problema nenhum em fazer isso, e até saudável fazer isso, para se evitar ter um template muito complexo, muito complicado para poder trabalhar.
+
+[04:54] Então, vamos partir para o próximo.
+
+@@04
+Centralizando updates em um único lugar
+
+[00:00] Outra coisa que eu quero fazer com vocês é o seguinte. Sempre que precisamos atualizar a nossa view, temos que chamar o método update de mensagemView e negociaçõesView?
+[00:17] Então, nas limitações da nossa solução, vamos pensar o seguinte: e se criarmos um método da nossa página chamado atualizaView, e esse método chama o método update de todas as views da nossa página. Mesmo que não tenha mudado, vamos chamar.
+
+[00:40] Porque a todo o momento que eu fizer uma ação de escrita, eu chamo o *update*View e sempre renderizo tudo. Não é muito bom por questões de performance da nossa solução, mas isso vai evitar esquecermos que toda vez que tiver que gerar uma operação, eu tenho que lembrar de "Ok, eu gerei essa operação, agora eu tenho de ir fazer o update de novo". Então, eu centralizo isso tudo em um único lugar.
+
+[01:05] Como ficaria? Vamos lá. Eu gosto de colocar método privado sempre como último. Eu vou colocar como privado, porque não faz sentido ninguém fora da classe chamá-lo. Eu vou chamar private atualizaView (): void.
+
+[01:29] O que eu vou colocar dentro desse item? Eu vou mover essas duas instruções de atualização da view para dentro do atualizaView. E aqui, no adiciona, eu sei que quando eu acabar de fazer tudo, o que eu vou fazer? Sempre no final do método, eu vou fazer aqui o atualizaView.
+
+[01:57] Se eu estiver em outro lugar, terei, no futuro, um lugar onde eu preciso atualizar a view novamente, eu vou chamar a atualizaView. E todo código de atualização de view vai ficar nesse lugar.
+
+[02:10] Claro, se você tem uma mensagem que você precisa selecionar se essa mensagem vai ser adicionada com sucesso, adicionada com fracasso, você não vai poder colocar dentro do atualizaView. Você vai ter de fazer de fora. Mas a ideia é você colocar a maior quantidade de métodos que atualiza a view nesse método genérico para que eu possa chamar e fazer ele atualizar para mim.
+
+[02:32] Então, está aqui o atualizaView. E outra coisa. O limpaFormulario, não faz sentido ele ser público, porque se eu olho a APP, a única coisa do Controller, que quem está de fora de APP quer chamar, é o adiciona.
+
+[02:49] Então, eu posso chegar agora aqui no meu negociações-controller, colocar esse item aqui como private, e esse item, sabemos que o padrão é public quando não coloca nada. Mas, a minha sugestão para vocês é: deixa evidente, não pega carona, não. Quem está lendo isso aqui vê rápido que é public, já vê isso direto.
+
+[03:16] Então eu vou fazer isso em todos os métodos que criamos até agora. Eu coloquei public nesse item aqui, coloquei private. Vou em negociações-view, esse item está com modificador, esse item está com modificador. Sobre a view, eu vou explicitar que esse item é public.
+
+[03:41] O negociações é public, adiciona. public lista. Então, com isso, começamos a lapidar mais um pouco, já começamos controlando melhor a visibilidade da nossa aplicação, decidindo o que vamos expor para o mundo externo.
+
+[04:09] E a sugestão que eu dou para vocês é: método privado, coloca sempre para o final. Porque quando eu vou ler esse código, eu não quero saber do método privado; eu quero saber o que faz parte da API pública. Eu vou ver o método adiciona.
+
+[04:20] Eu vou ver o método adiciona e vou ver que tem uma linha que cria negociação, outra que adiciona, uma que limpa o formulário e outra que atualiza a view.
+
+[04:30] Eu já tenho um entendimento mental, facilmente, do que esse método faz. Agora, se eu quiser saber detalhe, eu vou nos métodos privados, e vejo lá os detalhes de implementação. Então, vamos lá.
+
+@@05
+Aceitando apenas dias úteis
+
+[00:00] Precisamos continuar com a nossa aplicação, e tem mais uma especificação que desejamos implementar. Qual é a ideia? Não faz sentido eu cadastrar uma negociação feita em uma data que cai no sábado ou no domingo. Eu só posso considerar negociações em dias úteis.
+[00:20] Então, precisaremos implementar essa lógica. Mas você deve pensar: "Flávio, por que você está criando essa nova especificação? Qual a relação com o TypeScript?". Você vai ver.
+
+[00:32] Mas vamos pensar na lógica de resolver esse problema. Vou voltar lá no meu código. Temos o método adiciona, e eu sei que o método adiciona cria uma negociação para mim, e, nesse momento, eu tenho uma negociação com a data.
+
+[00:44] O que eu vou testar? Vou testar se if negociação.data.. Muito cuidado aqui, pois existe o getDate, e se eu passo o mouse por cima, o getDate pega o dia do mês, se é de 1, 2, 3, 4, 5, 6, até 30, 31, 28, e por aí vai. Mas o getDate retorna a data do dia da semana, se é segunda, terça, quarta, quinta, sexta, sábado, domingo.
+
+[01:26] Uma coisa que vocês têm que ter em mente é que esse valor começa de zero e vai até 6. Zero, é domingo. E vem segunda, terça, quarta, quinta, sexta e sábado. Sábado é 6. Então tem que ter isso em mente para implementarmos essa lógica.
+
+[01:42] Então, eu vou fazer o seguinte. if (negociação.data.getDay() > 0 && negociação.data.getDay() < 6), porque ele é um dia útil. Faz sentido? Então, se o getDay é maior que zero, ele vai ser um; se ele é menor que 6, vai ser 5. Então, se ele está nessa faixa, eu vou deixar esse item aqui.
+
+[02:40] Se não for, eu vou exibir uma mensagem para o usuário. Eu vou dizer que this.mensagemView.update(‘apenas negociações em dias úteis são aceitas’). Vou executar essa mensagem.
+
+[03:10] Então, a lógica está aí? Está. Vou salvar. Vou voltar para o meu navegador, nenhum erro de compilação. Eu sei que se eu colocar vários "uns', isso tudo vai cair em um dia que não é útil. Clico em incluir. Depois que eu validei todo o formulário, eu clico em incluir, e ele vai me dizer: "Apenas negociações em dias úteis são aceitas". Então eu vou colocar 12.
+
+[03:38] Clico. Continua também. Então, 11 é sábado; 12, domingo; então 13 vai ser segunda. Agora adicionou. "Negociação adicionada com sucesso". Então vem 13, 14, 15, 16, 17. 18 eu não vou poder. 17 eu posso. Agora, 18, eu não vou poder. Primeiro eu tenho de preencher tudo, passar a validação, e ele vai dizer que "Apenas negociações em dias úteis são aceitas".
+
+[04:11] Então, temos a validação, tem essa mensagem, tem tudo certo. Mas o que eu quero mostrar para vocês é o seguinte. Você, lendo esse código, ele não está muito legal. Você vê getDay > 0, getDay < 6. E agora que você aprendeu comigo em JavaScript, viu que zero é domingo; e seis, sábado.
+
+[04:36] Mas o código não está muito legível, essa lógica não está muito legal. Então, será que o TypeScript traz algo que possamos tentar resolver o nosso problema? É isso o que estudaremos no próximo vídeo.
+
+@@06
+Obtendo o dia da semana
+
+Temos a seguinte instância de Date:
+const date = new Date();
+COPIAR CÓDIGO
+Marque a opção verdadeira que retorna corretamente o dia da semana.
+
+date.getDay()
+ 
+Alternativa correta! Lembre-se que os dias da semana são representados por número que vão de 0 (domingo) a 6 (sábado).
+Alternativa correta
+date.getDate()
+ 
+Alternativa correta
+date.getDow()
+
+@@07
+Organizando melhor nosso código
+
+[00:00] Vamos lá. A primeira coisa que pode passar na sua cabeça é fazer isso aqui. Você chegar na propriedade da sua classe e colocar que o private sábado = 6. Colocar esse item, private domingo = 0.
+[00:28] E esses itens, você só quer ler, você quer que seja somente leitura. Ninguém pode modificar esse item. Então você vai lá e coloca readonly. E o que eu posso fazer no meu código? Onde está 0, eu coloco this.domingo.
+
+[00:52] Coloquei em letra maiúscula, como se fosse para simular o nome de uma constante. Tem essa convenção, sábado, constante, coloca em letra maiúscula. Será que vai funcionar? Vamos lá.
+
+[01:07] Vou salvar. Voltar para o navegador. Eu sei que essa data vai cair em data inválida, vou lá, faço isso. Clico aqui. "Apenas negociações em dias uteis são aceitas". Conseguimos resolver, melhorar, mas podemos melhorar ainda mais.
+
+[01:29] O que eu vou fazer? Eu vou criar um método privado. private ehDiaUtil, onde eu passo um date. Olha como vamos começar a organizar melhor o nosso código ainda sem usar alguns artifícios que eu vou mostrar para vocês.
+
+[01:52] O que esse código vai fazer? Se ele recebe uma data, eu vou retornar, return data.getDay() > this.domingo && data.getDay < this.sabado. Esse item vai me retornar verdadeiro ou falso.
+
+[02:35] Eu vou apagar isso daqui, vou apagar isso daqui, temporário. Olha, primeiro, como vai ficar o bloco de código. Eu vou fazer um early return, um retorno rápido. Primeira coisa que eu vou fazer é o seguinte. Criei a negociação, eu vou testar. if this.ehDiaUtil(negociacao.data).
+
+[03:01] Eu vou testar se não é; eu vou colocar uma exclamação. Porque se esse item não é, eu coloco uma exclamação e ele vai virar true. Olha o que eu vou fazer. Vou mostrar aqui a mensagem, e vou dar um return do método, de imediato.
+
+[03:19] Então, a validação desse método, eu vejo logo no início. Quando eu estou olhando o adiciona, eu sei que eu crio uma negociação e verifico se não é dia útil, eu vou exibir a minha mensagem e já vou fazer um retorno. Não preciso fazer o if e o eles nessa situação.
+
+[03:39] Vou salvar. Está aqui o método. Para ficar mais organizado. Volto no navegador. Coloco aqui. Vai me dizer que ele é "Apenas negociações em dias uteis são aceitas". Está funcionando.
+
+[04:05] Mas ainda assim, como eu falei no vídeo anterior, eu vou mostrar para vocês uma coisa do TypeScript que vai deixar o nosso código ainda mais elegante, mais elegante do que ele está agora. E agora, realmente, estudaremos isso no próximo vídeo.
+
+@@08
+Conhecendo enumerations
+
+[00:00] Nós melhoramos o nosso código, mas pode ficar ainda melhor. Deixa eu fazer uma pergunta para vocês. Nós criamos esse sábado e domingo na propriedade dessa classe como readonly, porque não faz sentido alguém chegar e dizer que this.sabado = ronaldo. Não faz sentido mudar o número para outro. Essa propriedade é readonly.
+[00:30] Se quisermos usar esses valores constantes, que nunca mudam, por exemplo, sábado, domingo, em outros lugares da aplicação, eu vou ter de chegar em outra classe se eu quiser usar lá dentro da negociação, por exemplo.
+
+[00:46] Eu vou chegar aqui dentro de negociação e eu posso chegar a querer criar um método para me dizer se a negociação é em dia útil ou não, então eu teria de copiar de novo esse sábado e domingo readonly em todos os lugares que eu fosse utilizar.
+
+[01:01] Então, vamos olhar os problemas que temos. Primeiro, eu quero que esse sábado e domingo, e todos os dias da semana, pode ser que eu queira saber se alguma coisa é segunda-feira, monday, sábado, domingo, segunda, terça. Então, será que tem algum jeito de eu conseguir reutilizar essas constantes em qualquer lugar da minha aplicação sem ter de repetir?
+
+[01:31] E garantir que esses valores sejam somente leitura? De uma maneira clássica, porque se eu olho sábado e domingo, isso pertence a um domínio de dia da semana. Será que conseguimos fazer isso? Consegue. O TypeScript tem uma estrutura de dados que permite fazer isso, que é a enumeration.
+
+[01:54] A primeira coisa que vamos fazer dentro de APP, eu tenho controllers, models e views. Eu vou criar uma pasta, que eu vou chamar de enums. Dentro de enums, eu vou deixar todas as enumerations da minha aplicação.
+
+[02:20] No caso, a enumeration que eu vou criar, o nome que eu vou definir para ela, vai ser o seguinte: vai ser dia da semana. Eu vou criar o arquivo dias-da-semana.ts. Criei. Como eu crio uma enum? Em TypeScript você usa enum DiaDaSemana, e esse item aqui, eu prefiro definir os valores dele.
+
+[02:57] Mas, logo de cara, deixa eu colocar o export, porque o dia da semana é uma enum, e dentro do módulo dias-da-semana.ts tem que ser exportada para que eu possa importar em outros lugares.
+
+[03:10] Agora, o que eu vou fazer? Eu vou definir os dias da semana. Eu vou definir quais são as constantes, os valores que não mudam dentro dessa enum. Eu gosto de colocar com caixa alta. Eu vou colocar DOMINGO, SEGUNDA, TERÇA, QUARTA, QUINTA, SEXTA, SÁBADO.
+
+[03:49] Você, olhando isso daqui, se eu passo o mouse por cima, você vai ver que o TypeScript, por padrão, ele coloca o valor da ENUM… O primeiro item começa de zero. É sempre um padrão TypeScript é zero. Segunda, 1; terça, 2; quarta, 3; quinta.
+
+[04:14] Esse é o padrão TypeScript que eu declarei. Vamos continuar. Vou salvar. Será que vai funcionar? Vamos ver. Dias da semana, está aqui. Vou lá no meu negociação-controller.
+
+[04:30] Onde eu testo o dia útil, em vez de testar no domingo, eu vou dizer DiasDaSemana. Dou enter. Vamos lá em cima. O meu código está compilando, só para ver se importou correto. DiasDaSemana.js.
+
+[04:50] Verifica se tem o js. Se por acaso sua IDE não importou esse arquivo correto, você importa o DiasDaSemana desço de uma pasta, dentro da pasta enum, e o módulo DiasDaSemana.
+
+[05:02] Volto lá para o meu código e digo para esse item se ele é maior que .domingo. E aqui, DiasDaSemana.sabado. Então, voltei para cá, volto para o meu código, .sabado. Fiz isso. Vendo o código, você verifica mais claro para você que data.getDay é maior que domingo, e é menor do que sábado?
+
+[05:52] E o mais legal é que essa enum, se eu tentar fazer domingo = 100 não vai aceitar, porque a enum é somente leitura por padrão. E você pode utilizar essa enum em qualquer lugar da sua aplicação, que você já vai ter definido qual é o domingo dessa enum no seu código.
+
+[06:20] Vou salvar. Nenhum erro de compilação. Volto no meu navegador. Vamos colocar esse dia. Gravei negociação só em dia útil, 17. Fiz. Adicionei. Agora, organizamos melhor o nosso código. Temos uma enum que podemos utilizar em qualquer lugar do nosso sistema, mas eu cometi uma gafe aqui, que provavelmente você pode cometer, que pode causar um problema enorme no uso de enum.
+
+[06:56] E é isso o que eu quero mostrar para vocês no próximo vídeo, para já começarmos com metade do processo feito e vocês não cometerem esse erro quando trabalhar com o enum com o TypeScript. Vamos para o próximo vídeo?
+
+@@09
+Cuidados na declaração de enums
+
+[00:00] Eu comentei que a enum permite criar, em um único lugar, constantes que podemos reutilizar no nosso sistema.
+[00:13] Com nome, com domínio. Todo lugar que eu for acessar a minha enum eu vou ter dias da semana, ponto. Aí eu listo todos os valores possíveis da enum. E uma coisa que eu falei para vocês é que quando vocês declaram uma enum, o TypeScript começa do primeiro valor aqui, zero, e vai até à última.
+
+[00:32] Começa de zero, 1, 2, 3, 4. É o valor padrão que ele adota. Agora, olha só. Peguei esse quarta e joguei para cá. O que vai acontecer. Quarta é quinta. Zero. Mudei a ordem da enum.
+
+[00:54] Salvei. Nenhum erro de compilação, volto lá para o meu projeto, digito. Foi. "Apenas negociações em dias úteis são aceitas". Mas o que ele fez? Ele pegou a quarta, que partiu de zero.
+
+[01:15] Então, a ordem da minha validação vai ficar quebrada, porque eu estou esperando que se o valor do elemento do day, que é domingo, domingo agora passou a ser 1.
+
+[01:32] Então, a dica é: você não sabe que você vai ter no enum. Pode ser que o enum, no nosso caso, a ordem que colocamos, foi uma ordem dos dias da semana. Mas você pode ter uma enum onde você pode ter valores que você queira colocar ordenado em ordem alfabética.
+
+[01:48] Então, se você muda a posição dos valores da enum, você vai mudar esse valor padrão que o TypeScript está colocando para você, que é zero, 1, 2, 3, 4 e 5.
+
+[01:57] Então, para você se blindar disso, esquece esse valor padrão do TypeScript. Você vai estipular, vai dizer na mão que esse item é zero, que esse item é 1, que esse item é 3, esse item é 4, esse item é 5 e esse item é 6.
+
+[02:18] Por quê? Porque se eu coloco agora, mudo a ordem, sábado vai continuar sendo 6, não vai dar problema nenhum. Quinta continuará sendo. Sábado, domingo. Eu mudo a ordem, salvo. Vou na minha aplicação. Vou executar. Nao pode aceitar. Agora, o dia 12 também não. Dia 13 tem que aceitar.
+
+[02:50] Então, aqui no caso eu vou colocar na ordem, porque nesse caso, eu, programador, a ordem, para mim, quando eu vir esse item aqui, importa. Mas você tem que se blindar é o seguinte: estipula qual é o valor do enum. Não cai nessa questão do TypeScript onde o zero é 1. Zero, 1, 2, 3, 4, 5.
+
+[03:14] Ficou claro? Então, fica essa dica. Ainda temos mais coisas para ver sobre enum, mas o mais importante era ver isso aqui. Vamos evoluindo e vendo mais coisas do enum.
+
+[03:26] Porque eu posso ter enum onde o valor não é só número. Eu posso colocar até string se eu quiser aqui. Dizer que esse item é Flávio. Então, pode ser qualquer valor que você estipular para enum, mas, por enquanto, eu ainda não tenho um uso de enum que trabalhe com string. Foi só para deixar claro que pode ser qualquer valor.
+
+[03:46] Fica essa dica, porque essa dica pode resultar em muitos erros na sua aplicação. Se você tem uma constante onde o desenvolvedor adiciona no final, adiciona no meio, ou adiciona no início, você vai mudar a ordem, principalmente se você está adotando esse valor padrão da enum, que é zero, 1, 2, 3, 4, 5, isso pode gerar problemas no seu código.
+
+[04:08] Ficou claro? Vamos blindar o nosso código, vamos fazer isso direito? Então, vamos continuar.
+
+@@10
+Identificando valores no enum
+
+Temos a seguinte enum:
+enum MinhaEnum {
+    A,
+    B = 3,
+    C,
+    D,
+    F
+}
+COPIAR CÓDIGO
+Qual o valor de MinhaEnum.D?
+
+6
+ 
+Alternativa correta
+5
+ 
+Alternativa correta! As enum começam de 0, porém, se modificarmos o valor de alguma das enum, os próximos valores passarão a contar a partir do novo valor.
+Alternativa correta
+4
+
+@@11
+Revisão
+
+[00:00] Vamos fazer uma revisão do que vimos no capítulo. A primeira coisa que estudamos foi sobre a questão de visibilidade de métodos. Por padrão, quando você declara um método em TypeScript, ele é public. É como se eu tivesse escrito public na frente, mas ele adota que é public.
+[00:19] Então, o que faremos? Se eu passo o nome por cima do método, ele me dá detalhes do método. Mas percebi métodos da minha classe que eu não quero tornar acessíveis para alguém do lado de fora.
+
+[00:32] Então é por isso que tornamos os métodos private. Porque, se olharmos no negociação-controller, o único método que queremos expor para quem for utilizar essa classe, é o método adiciona. O restante são métodos utilitários e que não faz sentido serem expostos para quem está utilizando o modelo.
+
+[00:52] Outra coisa que estudamos foi o processo de validação de negociação, porque não podemos aceitar que o usuário impute uma negociação que seja fora de um dia útil, que não seja em um dia útil.
+
+[01:02] Então criamos, primeiro, um método de dia útil que checa se é dia útil ou não a data da negociação que criamos. Nossa primeira abordagem foi que para trabalharmos com os dias da semana, sábado, domingo, segunda, terça, o método de date, que é getDay, que ele retorna qual é o dia da semana, retorna como número; zero é domingo. Então vai até 6, que é sábado.
+
+[01:29] E ficar lendo zero e 6 no código não é algo interessante. Nossa primeira tentativa foi isolar aqui, que eu até não apaguei, que eu vou apagar agora, foi isolar o sábado e o domingo em propriedades read ons do método da minha classe Controller, e utilizar para tornar o nosso código mais legível.
+
+[01:51] Salvei. Mas aprendemos que isso não é legal, porque se eu precisar utilizar essas mesmas constantes em outros lugares da minha aplicação, eu vou ficar repetindo código. Então, o interessante é que o TypeScript, diferente da linguagem JavaScript, ele traz o conceito de enuns.
+
+[02:07] Uma enum é uma namespace que você define. No caso, o namespace que eu defini é DiasDaSemana, em que você pode definir valores de constante. Valores que nunca vão mudar durante a sua aplicação, mas que eu posso, a qualquer momento, realizar DiasDaSemana.DOMINGO, e eu posso até jogar em uma variável esse valor.
+
+[02:29] Inclusive, se eu passo o mouse em cima dessa variável, eu vou ver que esse é item é de uma enum, que o valor dela é domingo. Então isso é legal, porque você, trabalhando com o enum, você dando o ponto, você sabe todos os valores constantes que dizem respeito a esse namespace.
+
+[02:48] Tanto isso é verdade que se eu volto para o negociação-controller, percebemos que o nosso método é dia útil, ele está pegando getDay, e está testando contra o valor da minha enum.
+
+[03:01] O importante é entender que o getDay retorna number, e o meu domingo é um valor numérico. Outra coisa que eu falei é para a tomar cuidado quando declaramos constantes, porque o que o TypeScript faz, por padrão, é que se eu defino uma constante e não digo qual é o valor dessa constante da enum, ele vai adotar como padrão o valor zero, 1, 2, 3, 4, na ordem.
+
+[03:29] Aprendemos que isso não é uma boa prática. Boa prática é eu estipular qual é o valor que eu quero para essa constante. Porque se eu mudar ela de posição, o valor não vai mudar porque não é o TypeScript que está atribuindo esses valores na ordem que eles aparecem aqui na definição da minha enum.
+
+[03:47] Ficou claro? Então está aí. Vimos os cuidados, e vamos partir para o próximo capítulo para vermos mais coisas.
+
+@@12
+Faça como eu fiz
+
+Chegou a hora de você seguir todos os passos realizados por mim durante esta aula. Caso já tenha feito, excelente. Se ainda não, é importante que você execute o que foi visto nos vídeos para poder continuar com a próxima aula.
+ DISCUTIR NO FÓRUM
+VER OPINIÃO DO INSTRUTOR
+
+Continue com os seus estudos, e se houver dúvidas, não hesite em recorrer ao nosso fórum!
+
+@@13
+O que aprendemos?
+
+Nesta aula, aprendemos:
+Visibilidade de métodos
+Validando negociações em dias úteis
+Vantagens do uso de enums
+Cuidados com enums
