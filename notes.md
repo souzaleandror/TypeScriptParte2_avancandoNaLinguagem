@@ -1455,3 +1455,294 @@ Nesta aula, aprendemos:
 Revisão da lógica de conversão negociações
 Método estáticos
 Parâmetros opcionais
+
+#### 24/06/2024
+
+@05-TSC e StrictNullChecks
+
+@@01
+Projeto da aula anterior
+
+Você pode ir acompanhando o passo a passo do desenvolvimento do nosso projeto e, caso deseje, você pode baixar o projeto do curso.
+Bons estudos!
+
+https://github.com/alura-cursos/typescript-curso-2/archive/0ea56bd441ca4b5113d10a4bc5b5190476f02a92.zip
+
+@@02
+Removendo comentários do código
+
+[00:00] Pessoal, vamos continuar. Neste capítulo, nós vamos dar uma aparada, vamos preparar um ambiente cada vez mais rígido, para evitar que erros aconteçam, nos preparando para o próximo módulo do curso de JavaScript, em discutiremos sobre decorators, interfaces, vamos começar a integração do Front-End com o Back-End, como fica essa questão de pegar os dados, a tipagem de dados, e entre outras coisas.
+[00:34] Mas então precisamos, no final desse curso, desse capítulo, preparar todo o ambiente para quando chegar nessa parte mais puxada, precisamos de um ambiente todo configurado, para evitar cometermos alguma gafe.
+
+[00:47] O que eu vou fazer? A primeira coisa, uma série de otimizações que vamos fazer, é o seguinte: não é raro o desenvolvedor pegar o código e colocar assim, um comentário.
+
+[01:00] Eu vou inventar um comentário, porque hoje eu não estou muito criativo. Vou colocar assim: “Zé, você já viu isso?”. Vou salvar. Salvei. Está lá meu código, tudo funcionando, tudo certo. Só adicionei o comentário.
+
+[01:18] O que acontece? Se voltarmos no nosso código e olha na pasta dist, aquela pasta gerada com os arquivos JavaScript, você em negociação-controller, no método adiciona, e eu vou ver que lá tem o comentário que eu coloquei no arquivo JavaScript.
+
+[01:40] Dependendo, se no seu código tem muitos comentários, se você usa JSDoc, você, no seu arquivo final, que vai ser carregado pelo navegador, você vai ter o comentário. E isso é legal, porque você quer que o arquivo resultante da compilação dos arquivos TypeScript seja o menor possível.
+
+[02:00] Em um projeto maior, com um escopo maior, você vai querer minificar, você vai querer gerar um monte de processo para compactar esse código e torná-lo o menor possível.
+
+[02:08] Então, será que tem como remover, no momento de compilação do nosso arquivo TypeScript para JavaScript, remover os comentários? Sim, podemos fazer isso de maneira automática.
+
+[02:19] Então, olha só. Vou fechar aqui. Vamos lá no tsconfig.json, e eu vou colocar mais uma propriedade, que é o removeComments, e eu vou colocar true.
+
+[02:36] Salvei. O meu projeto vai recompilar novamente. Agora eu vou em negociação-controller da pasta JS, e quando eu olho no meu arquivo JS, onde está o comentário? Não está aqui. Onde está o negociação-controller? O comentário está aqui.
+
+[02:58] Então, essa é uma pequena modificação que nos ajuda a diminuir o arquivo que vamos gerar no final. Não faz sentido, no meu arquivo resultante compilado, eu ter esses comentários.
+
+[03:11] Faz sentido eu ter no meu arquivo TS. Ficou claro? Agora, vamos ver outra coisa interessante no próximo vídeo.
+
+@@03
+Mudança no tsconfig.json
+
+Ivan tentou remover comentários de seus arquivos ts durante o processo de compilação para JavaScript. No entanto, os comentários ainda continuaram presentes nos arquivos js. Veja como ele configurou o arquivo tsconfig.json:
+{
+    "compilerOptions": {
+        "outDir": "dist/js",
+        "target": "ES6",
+        "noEmitOnError": true,
+        "noImplicitAny": false,
+        "removeComments": false
+    },
+    "include": ["app/**/*"]
+}
+COPIAR CÓDIGO
+Marque a alternativa correta a respeito da configuração realizada por Ivan.
+
+Por mais que ele tenha adicionado a propriedade removeComments, ele esqueceu de atribuir o valor true.
+ 
+Alternativa correta!
+Alternativa correta
+Ele escreveu o nome da propriedade errada, o correto é removeComment e seu valor deve ser true.
+ 
+Alternativa correta
+Ele esqueceu de atribuir true para a propriedade noImplicitAny.
+
+@@04
+A configuração strictNullChecks
+
+[00:00] Vamos voltar para a nossa aplicação e meditar sobre a qualidade do nosso código. Não do nosso código em si, mas do fluxo do nosso código.
+[00:10] Vou fazer uma pergunta: quando fazemos querySeletor, passando o ID, o que acontece se eu passar um ID que não existe? Qual vai ser o retorno dele? Está entendendo? O querySeletor, sabemos que ele retorna um HTMLImputElement, mas o que acontece se eu passar algo que não existe?
+
+[00:33] Vou passar um console.log aqui. this.inputData, e salvar. Nosso código passou. Vou voltar no navegador, vou abrir o console e olhar aqui. null. Então, se eu tentar executar a aplicação, colocando 12, 1, outro valor e clicar em executar, vamos ter um erro em runtime porque esse valor era null.
+
+[01:04] E olhando aqui, o TypeScript não nos ajudou, porque o querySeletor está retornando um HTMLImputElement. O TypeScript não tem como saber que isso pode retornar null ou não.
+
+[01:20] O ideal seria se a API do querySeletor mostrasse que o valor possa ser nulo ou um HTMLImputElement. O que acontece? Na verdade, essa API do querySeletor que você está vendo, o TypeScript sabe que esse item pode retornar um ImputHTMLtElement ou null.
+
+[01:52] Mas, por padrão, ele remove essa checagem de nulo. Vocês já vão entender. Olha o exemplo que o TypeScript me permite fazer. Vou fazer no APP para poder mostrar com mais clareza.
+
+[02:09] Eu vou dizer que const x pode ser uma string ou um número. Olha que loucura. Flávio ou number. Essa variável pode ser string ou number, e o TypeScript sabe que se eu coloco x., o que ele faz? Como eu atribuí uma string, ele sabe que esse item é o quê? Que método eu vou utilizar? O método string.
+
+[02:38] E se eu atribuir esse item como número, 10? Não vai ter erro de compilação. Porque eu estou dizendo que esse tipo pode ser um tipo ou outro tipo. É isso o que chamamos de Union Types. Eu não vou entrar em detalhe neste treinamento; no próximo, eu vou falar um pouquinho disso. Mas eu preciso falar sobre isso para entendermos uma coisa.
+
+[03:00] Então, você está vendo que eu ainda posso dizer que esse item, boolean, eu estou dizendo que essa variável aceita string, number ou boolean. Se eu colocar em true, vai funcionar.
+
+[03:14] Pegaram a ideia de que eu posso fazer isso? Eu posso dizer que uma variável pode ser um tipo, outro ou outro?
+
+[03:24] Então, eu prometo que no próximo módulo eu vou falar sobre Union Types com mais clareza, mas o importante é você entender isso aqui, porque olha o que vai acontecer.
+
+[03:34] O TypeScript, por padrão, no tsconfig.json, ele tem uma propriedade chamada strictNullChecks, que começa com falso. Se eu coloco falso aqui, vai ser o comportamento padrão que temos.
+
+[03:52] O que o TypeScript está fazendo? Ele não está te obrigando a lidar com propriedades que a situação pode ser nula, porque API pode te retornar null. Ele não está te obrigando a tratar, não está te obrigando a fazer nada. Tanto é verdade que se eu passo o mouse no querySeletor, ele está me dizendo que o querySeletor retorna HTMLimputElement.
+
+[04:16] Mas, olha o que vai acontecer quando eu colocar esse item. True. Salvei. Começou a ter erro de compilação em diversos lugares da nossa aplicação.
+
+@@05
+Revisando o strictNullChecks
+
+Marque a alternativa correta a respeito do efeito do StrictNullChecks quando ativado.
+Selecione uma alternativa
+
+Diz para o compilador TSC que pare de assumir implicitamente o tipo null para todos os tipos da aplicação. Caso null faça sentido, o desenvolvedor deve deixar isso explícito em seu código. Inclusive o StrictNullChecks obrigará o desenvolvedor a tratar todos os pontos de acesso a valores null em sua aplicação, forçando que o desenvolvedor pondere com cuidado cada cenário.
+ 
+Alternativa correta!
+Alternativa correta
+Faz com que compilador TSC aceite o valor null implicitamente para todos os tipos da aplicação.
+ 
+Alternativa correta
+Diz para o compilador TSC que pare de assumir implicitamente o tipo null para todos os tipos da aplicação. Caso null faça sentido, o desenvolvedor deve deixar isso explícito em seu código. Apesar das checagem, o desenvolvedor não é obrigado a tratar todos os pontos de acesso a valores null em sua aplicação.
+ 
+Alternativa errada! O desenvolvedor será obrigado a tratar todos os locais em seu código que tenham valor null.
+
+@@06
+Suprimindo a checagem onde faz sentido
+
+[00:00] A primeira coisa que eu quero mostrar para vocês é em app.ts. Olha o que ele está falando. O objeto possivelmente é nulo. O que é isso? Isso é verdade. Eu não mostrei para vocês, se colocarmos um ID de um elemento que não existe.
+[00:15] Aliás, ele pode ser nulo, porque na hora que eu faço o querySelector, se esse ID não existir, eu posso receber nulo. Agora, olha que legal. Quando eu passo o mouse em cima do querySelector, você vai ver que o TypeScript mudou o tipo desse item. Se eu volto lá em negociação-controller, esse item aqui está dizendo que é um HTMLInputElement ou nulo.
+
+[00:46] E isso é verdade. Então, o que o TypeScript está te dizendo aqui é o seguinte: "Olha só, eu não posso atribuir um valor que é do tipo HTMLInput ou nul em uma variável do tipo HTMLInput". Porque quando eu definir essa variável, em nenhum momento, agora, eu disse que eu quero aceitar esse null. Ou seja, eu teria que tornar esse item explícito que ele pode ser null.
+
+[01:17] Então, uma forma. Isso é interessante. Isso aqui vai criar um problema, eu vou gastar um, dois ou três vídeos para compilar, mas a ideia do StrictNullChecks é para você ter um cuidado hercúleo, um cuidado de Hércules quando você está trabalhando com uma API que pode retornar null ou não, lembrar o desenvolvedor que ele precisa tratá-la.
+
+[01:40] Então, como eu posso fazer? Vamos lá. A primeira coisa que eu vou tentar é fazer aqui, dizer que esse item é null. Passou. Resolvemos um problema aqui, vou dizer que ele pode ser null.
+
+[01:57] Não me importa se esse item é null ou não. Fiz isso. Resolvi o problema, que ele pode ser null ou não, mas agora, quando eu olho aqui embaixo, olha o que o TypeScript está falando: é possivelmente nulo.
+
+[02:12] Então, eu teria que fazer um teste, checar. Se ele está nulo, é porque teve um problema. Então eu não preciso continuar na minha aplicação. "if valor tal" é nulo, eu devo lançar mais sessão? Então, ele começa a te amarrar aqui de uma maneira que é legal, mas às vezes não é tão legal assim.
+
+[02:30] Por exemplo, aqui eu quero assumir que o retorno de querySelector, porque eu não quero ficar tratando se ele existe ou não. Eu quero que o TypeScript faça o teste dos lugares que possivelmente é nulo, mas no querySelector, na hora em que eu estou obtendo o item do DOM, eu não quero que ele faça, considere que ele possa ser null, e me dar o trabalho de tratá-lo.
+
+[03:02] Então, o que eu posso fazer? Ele me retorna o HTMLInputElement ou null. Eu posso dizer o seguinte HTMLInputElement. Quando eu faço esse as, as HTMLInputElement. Meu código continua compilando, ele passou.
+
+[03:36] O que é esse tal de as, Flávio? Eu estou dizendo que o retorno dessa função, eu vou converter para um tipo que eu garanto, que eu assumo que não vai dar problema. Qual é o tipo atual? O tipo atual é o HTMLInput ou null.
+
+[03:52] O que eu estou dizendo? Estou dizendo que não, que o tipo que vai ser retornável para o TypeScript vai ser HTMLInputElement. Eu estou forçando a mudança do tipo. Antes era HTMLInput/ ou nulo. E agora estou fazendo o que chamamos de casting explícito.
+
+[04:12] Eu estou fazendo um casting, uma transformação desse resultado, porque eu, desenvolvedor, assumo a responsabilidade disso. Essa é a sintaxe recomendada, mas eu também posso fazer o casting dessa maneira: HTMLInputElement.
+
+[04:30] E posso colocar isso daqui na frente do método no qual estou dizendo para método:"Olha, eu sei que você vai retornar. Você pode retornar uma abóbora, mas eu vou dizer para o programador que eu garanto que esse item vai ser um HTMLInputElement".
+
+[04:48] Então, podemos fazer dessas duas maneiras. Eu vou deixar esse item desse jeito aqui, ou do jeito com as, que é o jeito mais recomendado, sugerido pela equipe. Apesar de eu gostar mais dessa forma aqui. Então isso resolveu o meu problema do StrictNullChecks.
+
+[05:07] Na verdade, não resolveu. Na verdade, calou a boca do compilador, porque para questões de pegar elemento do DOM, isso é uma loucura. Eu ficar testando se ele existe, não existe toda hora. Então, eu quero passar por isso. Pelo menos essa parte eu não quero ter que tratar.
+
+@@07
+Tratando null em nosso código
+
+[00:00] No vídeo anterior, nós adotamos que eu quero o melhor dos dois mundos. Eu quero o StrictNullChecks no meu código, para evitar, para me lembrar de todos os lugares que pode ter null e lembrar o desenvolvedor e me lembrar onde eu preciso fazer um teste, mas eu quero ignorá-lo na hora de pegar elementos do DOM, porque senão eu vou fazer muito if e muito check, e eu assumo essa responsabilidade.
+[00:29] Porém, quando eu vou em APP, eu vou mostrar para vocês porque o StrictNullChecks é interessante. Esse item aqui, nós vimos que quando eu ativo o StrictNullChecks, o querySelector, ele pode retornar element ou null para esse item.
+
+[00:46] Como eu não defini o tipo de form, ele está adotando, automaticamente, element ou null. Então, não tem um erro igual eu tive no controller. Eu teria se tivesse colocado HTMLInputElement, aí ele vai dizer que o HTMLInputElement, esse tipo, não está na especificação dizendo que ele pode receber nulo.
+
+[01:11] Mas, o querySelector pode retornar ele ou nulo. Então, de novo, quando o StrictNullChecks não está ativo, o TypeScript considera null como um valor possível para todos os tipos que você criou. Essa é a ideia.
+
+[01:30] Só que as pessoas viram, no passado, que não era muito interessante, porque pode gerar bugs. Então, o que eles fizeram? Eu posso desligar esse comportamento que o padrão é falso, ligar o StrictMode.
+
+[01:41] Então, qualquer variável que eu declarar, se eu quero que ela receba nula, se faz sentido, eu tenho que dizer que faz sentido ser nulo na hora que eu declarar a variável. Ou é esse elemento, ou é nulo. Ainda assim, já que pode ser nulo, o TypeScript é inteligente e sabe que eu tenho que tratá-lo, que esse código pode ser nulo e dar um erro em tempo de execução.
+
+[02:07] Mas para esse item aqui, eu vou deixar o padrão que está aqui e vou agora fazer o teste. Não vou calar a boca, não vou fazer assim: HTMLInputElement, como eu fiz para o Controller. Eu vou mostrar para vocês como o TypeScript é genioso.
+
+[02:25] Esse código pode ser nulo, não pode? Porque come eu atribuí o querySelector para essa variável e não declarei o tipo, se o padrão do querySelector é element e null, então ele vai adotar esse item como element e null.
+
+[02:39] Então, já que ele é null, eu tenho que fazer um teste. Olha o que eu vou fazer. if (form). Se form existe, se não é nulo, ou se não é undefined, eu vou fazer o quê? Adicionar o addEventListener().
+
+[02:56] E você ve que o TypeScript é inteligente para saber que o seu código está dentro de uma condição if, então ela para de reclamar, porque ela sabe que você testou se ele é nulo ou não.
+
+[03:06] E o que eu vou fazer? Eu vou dizer que se ele não for, eu vou colocar um console.log. Na verdade, eu vou dar um throw Error(Não foi possível inicializar a aplicação. Verifique se o form existe. Vou colocar essa mensagem.
+
+[03:38] O TypeScript é interessante porque ele consegue analisar o seu fluxo e saber que esse item, se você fez a condição if, você cai lá dentro. E se eu tentar fazer o form., olha o que o TypeScript vai fazer.
+
+[03:55] Não pode. Porque no else, ele sabe que é nulo. Entendeu? Então, hoje, por exemplo, se você queria um projeto em angular 11, novo, você tem a opção de ativar o strict mode do TypeScript, que não vem só com o strict no checks, inplicit any types, ele vem com outros recursos também que você já começa do projeto com ele como padrão.
+
+[04:22] Então aqui está mais uma coisa. Vou salvar. Vamos ver se está tudo compilando. Ainda tem erro? Tem. Na view.ts
+
+@@08
+Últimos ajustes
+
+[00:00] Então vamos lá resolver isso. Eu não vou querer silenciar. Esse aqui, o código, ele é utilizado por diversas views, não é um código que eu vvou ficar repetindo. Então, se eu fizer um tratamento, vai ficar interessante.
+[00:18] Então, o que eu vou fazer? Primeiro, vamos lá, com calma, entender aqui. O querySelector está atribuindo o retorno dele para elemento. Elemento de qual tipo? HTMLElement. Então, o querySelector entende que esse valor, quando foi retornado, tem que ser convertido para o tipo HTMLElement.
+
+[00:38] Mas esse HTMLElement não condiz com ele, porque ele pode retornar nulo. Eu não vou dizer que ele pode receber nulo. Não vou dizer. O que eu vou fazer é o seguinte. Vou deixar as duas linhas para vocês poderem ver. Elemento.
+
+[01:00] Como esse item não definiu um tipo para ele, eu estou atribuindo direto do querySelector, o querySelector, por padrão, ele retorna element. Então, esse item é um element. Ele pode ser nulo ou um element, porque ele está recebendo direto o valor.
+
+[01:19] Lembra que o TypeScript pega através da atribuição e sabe qual é o tipo? Fiz isso. O que eu vou fazer agora? Eu vou testar if (elemento), eu vou dizer que this.elemento = elemento. Mas eu vou ter um erro de compilação. Por quê? Porque esse item pode ser element e null, e esse item, dentro da minha condição if, ele não é mais nulo.
+
+[02:00] Está mostrando só element. Mas esse element, eu não posso atribuir em um cara que é HTMLElement. Então eu vou fazer um teste. Vou dizer que esse item as HTMLElement. Senão, eu vou fazer um throw Error, e vou dizer Seletor não existe no DOM. Verifique.
+
+[02:41] Eu não tenho como recuperar a minha aplicação. Eu tenho que fazer ela dar crash, mas dar crash com alguma mensagem que signifique algo para o desenvolvedor. Não tem como colocar alguém que vai substituir o elemento que eu quero. Então faz sentido lançar essa exceção.
+
+[03:00] Fiz isso. Salvei. Vamos olhar o compilador. Deixa eu testar, ver se está funcionando. Aí testando, funcionando, eu faço uma revisão disso de novo, porque vamos levar essa restrição para o próximo módulo.
+
+[03:14] Vou voltar para o navegador, que está carregado. Vou fazer 15, 1, mais 1. Cliquei em incluir. Perfeito. O que eu vou fazer agora? Vou lá em negociações-controller, onde tem negociações-view eu vou colocar um X aqui, que ele não vai encontrá-lo.
+
+[03:40] Salvo. Meu código não funcionou, e eu já vi aqui: negociação-view não existe no DOM. E eu consigo ver qual é a linha do código.
+
+[03:51] Então, está aí. Fizemos o nosso código compilar. Agora vamos ao vídeo de revisão, fazer uma revisão sobre isso, para fechar e preparar para o próximo módulo, já que precisamos ter esse recurso no StrictNullChecks ligado para ficar mais semelhante com projetos novos que você cria em outros frameworks, como o Angular e o React.
+
+[04:14] Agora, se você tem um projeto legal, com milhões de arquivos, você ligar essa opção, pode ser um problema para a sua aplicação. Vamos para o vídeo da revisão.
+
+@@09
+Revisão
+
+[00:00] Vamos fazer uma revisão do que aprendemos no capítulo. Durante esse capítulo, nós mexemos em duas configurações extras no compilador do TypeScript. Uma é o removeComments. Essa aí significa que todo código de comentário que você escrever no seu arquivo TypeScript, ele não vai aparecer no arquivo compilado.
+[00:21] Mas o grande ponto de destaque deste capítulo foi a ativação do StrictNullChecks. Vamos lembrar. Qual é o padrão do TypeScript? É o seguinte. Todo atributo, variável, com propriedade de classe, com variável que você declara, todos eles aceitam o tipo null por padrão.
+
+[00:47] Isso significa que se eu atribuir null aqui, com patrão, sem mexer no compilador TypeScript, ele aceita. Eu consigo atribuir null a esse tipo. Por quê? Porque quando, no TypeScript, lá no tsconfig.json, o padrão é false. Quando é false, eu posso atribuir no para esse tipo. Porque o TypeScript diz que qualquer tipo, no meu sistema, pode receber null.
+
+[01:19] Só que isso pode ser um problema, porque na sua aplicação, você pode ter um valor nulo que você não tratou, e você só vai descobrir o erro em runtime, pode ser um problema.
+
+[01:27] Então, o que a equipe do TypeScript fez? Ela fez o seguinte. Você pode dizer o StrictNullChecks é true. E fazendo isso, você vai ver que o meu código de negociação-controller não vai mais compilar. Por quê? Porque o TypeScript tirou aquela funcionalidade, no qual, qualquer tipo de aplicação, sem que o desenvolvedor defina, pode receber nulo.
+
+[01:52] Então, se eu olho esse tipo, qual é esse tipo? HTMLInput não tem nada dizendo que ele pode receber null. Se eu quiser atribuir null, usamos esse ou | para dizer que esse item pode ser HTMLInput ou null, isto é, HTMLInputElement | null.
+
+[02:08] Esse é o padrão que o TypeScript faz, por debaixo dos panos, quando essa opção está desligada. Ele coloca tipo um type null em todas as variáveis e propriedades de classe que você cria, métodos, e por aí vai.
+
+[02:22] Deixa eu voltar para cá. Vou colocá-lo como true. Vou remover isso aqui. Nós vimos que todo lugar que eu chamar uma API, e essa API pode retornar null, eu vou ter de tratar a minha variável, porque isso pode quebrar o fluxo da minha aplicação.
+
+[02:43] Um exemplo é o querySelector. Quando eu desligo o StrictNullChecks, esse item está dizendo que o querySelector pode HTMLInput ou null. Mas esse item aqui não aceita null.
+
+[03:07] E eu não quero que ele aceite, não faz sentido para mim. Então, o que eu deveria fazer aqui? Eu deveria testar. If, se o valor existe, se não, tento recuperar o estado da minha aplicação. Mas definimos que quando estamos pegando elementos do DOM, nós não vamos fazer a checagem.
+
+[03:23] Vamos silenciar o compilador porque eu estou assumindo a responsabilidade disso. Se você vem do mundo Angular, existe um decorator chamado child ou children, que você também pode silenciar, porque não tem como.
+
+[03:40] Você tem que confiar que aquele valor vai chegar, porque não é você que atribui aquele valor, é o contêiner do ângulo.
+
+[03:46] Então, fizemos isso porque eu estou dizendo que, agora, esse querySelector não vai retornar HTMLInput ou null, ele vai retornar um HTMLInput. Flávio, e se ele retornar ‘null?’. Eu não vou saber. Meu código vai dar problema. Mas eu, como programador, estou assumindo a responsabilidade, fazendo o que chamamos de casting, convertendo um valor, um tipo para outro.
+
+[04:09] Convertendo qual tipo? O tipo HTMLInput, ou null, para HTMLInput, apenas. Ou eu posso usar a outra sintaxe. Estou usando as, e eu digo aqui o tipo que eu quero.
+
+[04:21] Como eu falei no curso, aprenderemos mais sobre Union Types em um próximo módulo. Eu silenciei o StrictNullChecks, e o meu código está funcionando. Mas estudamos também no APP, que no caso do APP, eu não quis silenciar, eu quis tratar.
+
+[04:41] E o TypeScript é inteligente, porque se esse valor pode ser null, e você tem uma condição if, dentro da condição if, você para de ter erros de compilação. Porque o TypeScript é inteligente para saber que essa condição if só vai ser executada se tiver algum valor lá dentro. Já na condição else, não.
+
+[04:58] Então é por isso que se eu tentar usar o form aqui e colocar o edge, ele vai dizer que esse item pode ser possivelmente nulo. E no caso da nossa aplicação, eu quero que lance um erro no console.
+
+[05:10] Então a sacada de quando você vai tratar null ou não, é que você vai tratar o null e vai tentar recuperar sua aplicação de alguma maneira. Colocar um valor para substituir o valor null, ou tentar resolver de outra forma.
+
+[05:25] Ou então, o que você vai fazer, é o seguinte: se não tiver como recuperar sua aplicação, você vai lançar uma exceção para que o desenvolvedor saiba o que está acontecendo por debaixo dos panos enquanto sua aplicação está rodando.
+
+[05:38] Porque nem sempre conseguimos recuperar a nossa aplicação. Por exemplo, aqui não tem nada que eu possa colocar no lugar do form para fazer ele funcionar.
+
+[05:47] Então, precisamos desse jogo de cintura. O StrictNullChecks foi ativado. No próximo módulo, no terceiro curso de JavaScript, que vai ser um pouco mais cheio de técnica, mas um pouco mais puxado, nós já vamos adotar como padrão para evitar ter um código null e chegar em uma situação onde possamos gerar algum tipo de desconforto ou erro dentro do nosso código.
+
+[06:15] Está bom? Chegando no final do curso, eu tenho uma palavrinha para vocês no próximo vídeo.
+
+@@10
+Faça como eu fiz
+
+Chegou a hora de você seguir todos os passos realizados por mim durante esta aula. Caso já tenha feito, excelente. Se ainda não, é importante que você execute o que foi visto nos vídeos para poder continuar com os próximos cursos que tenham este como pré-requisito.
+
+Continue com os seus estudos, e se houver dúvidas, não hesite em recorrer ao nosso fórum!
+
+@@11
+Projeto final do curso
+
+Você pode baixar o projeto final ou acessar os arquivos no GitHub.
+Aproveite para explorá-lo e revisar pontos importantes do curso.
+
+Bons estudos!
+
+https://github.com/alura-cursos/typescript-curso-2/archive/30b4b7cd0d845e19cbc50a784c1b67a602d6ed36.zip
+
+https://github.com/alura-cursos/typescript-curso-2/
+
+@@12
+O que aprendemos?
+
+Nesta aula, aprendemos:
+Remoção de comentários do código compilado
+Ativação do strictNullChecks
+Como suprimir erros, quando fizer sentido, resultantes do strictNullChecks
+Benefícios do strictNullChecks no controle do fluxo da sua aplicação
+
+@@13
+Conclusão
+
+[00:00] Parabéns por chegar ao final de mais um curso aqui da plataforma, TypeScript parte 2: Avançando na linguagem. Algo que eu desejei desde o início da criação do curso é: mostrar a linguagem TypeScript com um projeto ao fundo, e também mostrar como integramos os recursos do TypeScript para implementar o paradigma da orientação de objetos.
+[00:22] Nós vimos a parte de herança, a parte de encapsulamento, vimos como configurar o TypeScript de uma maneira de garantir que o nosso código, durante o tempo de compilação, vai ser mais saudável, vai funcionar.
+
+[00:35] Nós finalmente terminamos a parte de implementação da tabela que vamos exibir para o usuário, da nossa view.
+
+[00:42] Criamos um micro framework, que lembra um pouquinho o que o React faz com o JSX, claro, guardando as devidas proporções, para tornar este treinamento interessante e motivar bastante coisa da linguagem TypeScript.
+
+[00:55] Esse curso não é o fim. Vai ter um terceiro módulo, e nesse terceiro módulo, teremos assuntos que ainda não conhecemos, mas vamos pensar o seguinte.
+
+[01:03] O primeiro curso de fundamentos foi um curso onde o aluno viu a linguagem TypeScript pela primeira vez, e começou a caminhar com um projeto. Já esse segundo, avançando, terminou o projeto, e conseguiu praticar muitos recursos da linguagem TypeScript sob o enfoque da orientação ao objeto.
+
+[01:23] Já o terceiro curso, vamos aprender a organizar o nosso código da melhor maneira possível utilizando outros recursos da linguagem TypeScript para tornar o nosso código ainda melhor, mais limpo, mais fácil de manter, e também tendo menos chance de ter erros.
+
+[01:40] Para vocês, eu desejo tudo de bom. Se você chegou até aqui, não desista. Tem mais um degrau pela frente. Vamos lá, e vamos nos encontrar no próximo curso. Um abraço.
